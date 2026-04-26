@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KVON TECH | Admin Control Center</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { 
+            --kvon-blue: #1d426e; 
+            --kvon-orange: #f47920; 
+            --bg-light: #f4f7fa; 
+        }
+        body { background: var(--bg-light); font-family: 'Inter', sans-serif; margin: 0; }
+        
+        /* Sidebar Admin Style */
+        .sidebar { 
+            height: 100vh; width: 280px; position: fixed; 
+            background: var(--kvon-blue); color: white; padding: 30px 20px; 
+            z-index: 1000; display: flex; flex-direction: column;
+        }
+        .main-content { margin-left: 280px; padding: 40px; min-height: 100vh; }
+        
+        .admin-brand { 
+            text-align: center; margin-bottom: 40px; padding-bottom: 20px; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+        }
+        .admin-brand h4 { font-weight: 800; letter-spacing: 1px; margin: 0; }
+        .admin-brand span { color: var(--kvon-orange); }
+
+        .nav-link-admin { 
+            color: rgba(255,255,255,0.7); padding: 15px 20px; 
+            display: block; text-decoration: none; border-radius: 12px; 
+            margin-bottom: 10px; transition: 0.3s; font-weight: 500;
+        }
+        .nav-link-admin:hover, .active-admin { 
+            background: rgba(255,255,255,0.1); color: white; 
+        }
+
+        /* Profile in Sidebar */
+        .admin-profile { margin-top: auto; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 15px; text-align: center; }
+
+        /* Stats & Cards */
+        .admin-card { 
+            border: none; border-radius: 20px; background: white; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 25px; 
+            margin-bottom: 30px; 
+        }
+        .section-title { font-weight: 700; color: var(--kvon-blue); margin-bottom: 25px; display: flex; align-items: center; }
+        .section-title i { margin-right: 12px; color: var(--kvon-orange); }
+
+        /* Approval Table */
+        .table-approval { background: #fffaf5; border: 1px solid #ffe8d6; border-radius: 15px; padding: 20px; margin-bottom: 40px; }
+        .btn-approve { background: #28a745; color: white; border-radius: 10px; font-weight: 600; padding: 8px 25px; border: none; text-decoration: none; display: inline-block; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="admin-brand">
+            <h4>KVON <span>ADMIN</span></h4>
+        </div>
+        
+        <nav>
+            <a href="/dashboard" class="nav-link-admin active-admin"><i class="fa fa-chart-line me-2"></i> Company Overview</a>
+            <a href="#" class="nav-link-admin"><i class="fa fa-users me-2"></i> Staff Directory</a>
+        </nav>
+
+        <div class="admin-profile">
+            <h6 class="fw-bold mb-3">{{ current_user.first_name }} (Administrator)</h6>
+            <a href="/logout" class="btn btn-sm btn-danger w-100 rounded-pill fw-bold shadow-sm">Logout</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h2 class="fw-bold text-dark mb-1">Management Console</h2>
+                <p class="text-muted fw-medium">{{ today }}</p>
+            </div>
+            <div>
+                <span class="badge bg-dark px-3 py-2 rounded-pill">KVON TECH PORTAL V5.0</span>
+            </div>
+        </div>
+
+        {% if pending %}
+        <div class="table-approval shadow-sm">
+            <h5 class="section-title"><i class="fa fa-user-plus"></i> New Staff Requests</h5>
+            <div class="table-responsive">
+                <table class="table table-borderless align-middle mb-0">
+                    <thead class="text-muted small text-uppercase">
+                        <tr><th>Full Name</th><th>Work Email</th><th>Employee ID</th><th class="text-center">Action</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for u in pending %}
+                        <tr class="border-top">
+                            <td class="fw-bold">{{ u.first_name }} {{ u.last_name }}</td>
+                            <td>{{ u.email }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ u.emp_id }}</span></td>
+                            <td class="text-center">
+                                <a href="/admin/approve/{{ u.id }}" class="btn-approve">Approve Account</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="admin-card">
+            <h5 class="section-title"><i class="fa fa-clipboard-list"></i> Master Attendance Logs</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light small text-uppercase">
+                        <tr><th>Employee</th><th>Date</th><th>Punch In</th><th>Punch Out</th><th>Selfie</th></tr>
+                    </thead>
+                    <tbody class="small">
+                        {% for log in logs %}
+                        <tr>
+                            <td><div class="fw-bold text-dark">{{ log.emp_full_name }}</div></td>
+                            <td>{{ log.check_in.strftime('%d %b, %Y') }}</td>
+                            <td class="text-primary fw-bold">{{ log.check_in.strftime('%I:%M %p') }}</td>
+                            <td>
+                                {% if log.check_out %}
+                                    {{ log.check_out.strftime('%I:%M %p') }}
+                                {% else %}
+                                    <span class="text-warning fw-bold">Active On Duty</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/static/uploads/{{ log.selfie }}" target="_blank" class="btn btn-sm btn-light border px-3">
+                                    <i class="fa fa-image me-1"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

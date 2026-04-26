@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KVON TECH | Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --kvon-orange: #f47920; --kvon-blue: #1d426e; }
+        body { background: #eef2f7; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-card { border: none; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 400px; background: white; padding: 2.5rem; border-top: 6px solid var(--kvon-orange); }
+        .nav-pills .nav-link { color: var(--kvon-blue); font-weight: bold; border-radius: 10px; border: 1px solid #ddd; margin: 0 5px; }
+        .nav-pills .nav-link.active { background: var(--kvon-blue) !important; color: white !important; border: none; }
+        .btn-kvon { background: var(--kvon-blue); color: white; border-radius: 10px; padding: 12px; font-weight: bold; width: 100%; border: none; }
+    </style>
+</head>
+<body>
+    <div class="login-card text-center">
+        <img src="{{ url_for('static', filename='logo.png') }}" style="width: 100px;" class="mb-4">
+        
+        <ul class="nav nav-pills justify-content-center mb-4">
+            <li class="nav-item">
+                <button class="nav-link active" id="emp-tab" onclick="setRole('employee')">Employee</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="admin-tab" onclick="setRole('admin')">Admin</button>
+            </li>
+        </ul>
+
+        <h4 id="portal-text" class="mb-4 fw-bold" style="color: var(--kvon-blue);">Employee Portal</h4>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}{% for category, message in messages %}
+            <div class="alert alert-{{ category }} small">{{ message }}</div>
+          {% endfor %}{% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <input type="hidden" name="login_as" id="login_as" value="employee">
+            <input type="text" name="identity" class="form-control mb-3" placeholder="Username or Email" required>
+            <input type="password" name="password" class="form-control mb-4" placeholder="Password" required>
+            <button type="submit" class="btn btn-kvon shadow">LOGIN</button>
+            <p class="mt-4 small">Need an account? <a href="/signup">Signup</a></p>
+        </form>
+    </div>
+
+    <script>
+        function setRole(role) {
+            document.getElementById('login_as').value = role;
+            document.getElementById('portal-text').innerText = (role === 'admin' ? 'Admin Control' : 'Employee Portal');
+            document.getElementById('emp-tab').classList.toggle('active', role === 'employee');
+            document.getElementById('admin-tab').classList.toggle('active', role === 'admin');
+        }
+    </script>
+</body>
+</html>
