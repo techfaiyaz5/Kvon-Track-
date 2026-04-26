@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: student-app
-        image: techfaiyaz5/kvontrack-gemini:latest # Jenkins ise auto-update karega
+        image: techfaiyaz5/kvontrack-gemini:19
         ports:
         - containerPort: 5000
         resources:
