@@ -1,0 +1,47 @@
+# 1. Deployment File: Ye bataegi ki app kaise chalegi
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kvontrack-deployment
+  labels:
+    app: kvontrack
+spec:
+  replicas: 2 # Do pods chalenge, agar ek crash hua to dusra sambhal lega
+  selector:
+    matchLabels:
+      app: kvontrack
+  template:
+    metadata:
+      labels:
+        app: kvontrack
+    spec:
+      containers:
+      - name: kvontrack-app
+        # Yahan Jenkins wala image name aayega (latest tag ke saath)
+        image: your-dockerhub-username/kvontrack-gemini:latest 
+        ports:
+        - containerPort: 5000
+        # Resources limit taaki server hang na ho
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+
+---
+
+# 2. Service File: Ye app ko bahar ki duniya (internet) se connect karegi
+apiVersion: v1
+kind: Service
+metadata:
+  name: kvontrack-service
+spec:
+  selector:
+    app: kvontrack
+  ports:
+    - protocol: TCP
+      port: 80 # Bahar se port 80 par access hoga
+      targetPort: 5000 # Flask app 5000 par chal rahi hai
+  type: LoadBalancer # AWS par ye ek Elastic Load Balancer (ELB) bana dega
