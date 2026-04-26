@@ -49,6 +49,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'github-creds', passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
                         sh "git config user.email 'jenkins@example.com'"
                         sh "git config user.name 'Jenkins CI'"
+                        sh "git checkout testing"
                         sh "git add k8s/main.yaml"
                         sh "git commit -m 'Update image tag to ${IMAGE_TAG}'"
                         // Apna sahi repo URL yahan dalna mat bhulna
