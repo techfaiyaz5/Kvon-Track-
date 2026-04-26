@@ -7,229 +7,364 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { 
-            --kvon-orange: #f47920; 
-            --kvon-blue: #1d426e; 
-            --kvon-bg: #f8f9fc; 
+        :root {
+            --kvon-orange: #f47920;
+            --kvon-blue: #1d426e;
+            --kvon-bg: #f0f2f5;
         }
-        body { background: var(--kvon-bg); font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
-        
-        /* Sidebar Styles */
-        .sidebar { 
-            height: 100vh; width: 280px; position: fixed; 
-            background: var(--kvon-blue); color: white; padding: 25px 15px; 
-            z-index: 1000; display: flex; flex-direction: column;
+        * { box-sizing: border-box; }
+        body { background: var(--kvon-bg); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+
+        /* ---- SIDEBAR ---- */
+        .sidebar {
+            height: 100vh; width: 270px; position: fixed;
+            background: var(--kvon-blue); color: white;
+            padding: 25px 15px; z-index: 1000;
+            display: flex; flex-direction: column;
         }
-        .main-content { margin-left: 280px; padding: 30px; min-height: 100vh; }
-        
-        /* Round Logo */
-        .logo-round { 
-            width: 100px; height: 100px; border-radius: 50%; 
-            background: white; margin: 0 auto 35px; 
+        .main-content { margin-left: 270px; padding: 30px; min-height: 100vh; }
+
+        .logo-round {
+            width: 90px; height: 90px; border-radius: 50%;
+            background: white; margin: 0 auto 30px;
             display: flex; align-items: center; justify-content: center;
             border: 3px solid var(--kvon-orange); overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
         }
         .logo-round img { width: 75%; height: auto; object-fit: contain; }
-        
-        /* Sidebar Links */
-        .nav-item { 
-            color: rgba(255,255,255,0.7); padding: 14px 20px; 
-            display: block; text-decoration: none; border-radius: 12px; 
-            transition: 0.3s; margin-bottom: 10px; font-size: 0.95rem;
-        }
-        .nav-item:hover, .active-nav { background: var(--kvon-orange); color: white; font-weight: 600; }
 
-        /* Profile Bottom Area */
-        .profile-bottom { 
-            margin-top: auto; padding-top: 25px; 
-            border-top: 1px solid rgba(255,255,255,0.1); 
+        .nav-item {
+            color: rgba(255,255,255,0.75); padding: 13px 18px;
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; border-radius: 10px;
+            transition: 0.25s; margin-bottom: 6px; font-size: 0.9rem;
         }
-        .profile-img-gol { 
-            width: 60px; height: 60px; border-radius: 50% !important; 
+        .nav-item:hover, .active-nav {
+            background: var(--kvon-orange); color: white; font-weight: 600;
+        }
+        .nav-divider {
+            border-top: 1px solid rgba(255,255,255,0.12);
+            margin: 14px 0;
+        }
+
+        /* Profile bottom */
+        .profile-bottom {
+            margin-top: auto; padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.12);
+        }
+        .profile-img-gol {
+            width: 52px; height: 52px; border-radius: 50%;
             border: 3px solid var(--kvon-orange); object-fit: cover;
-            background: #fff;
         }
 
-        /* Action Bar */
-        .header-action { 
-            background: white; padding: 20px 25px; border-radius: 18px; 
-            margin-bottom: 35px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); 
+        /* ---- HEADER ---- */
+        .header-card {
+            background: white; padding: 20px 25px; border-radius: 16px;
+            margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .btn-check { border-radius: 12px; padding: 12px 35px; font-weight: 700; border: none; transition: 0.3s; font-size: 0.9rem; }
-        .btn-in { background: var(--kvon-orange); color: white; }
-        .btn-out { background: #dc3545; color: white; }
-
-        /* Stats Section - 3 Columns */
-        .card-stats { 
-            border: none; border-left: 5px solid var(--kvon-orange); 
-            border-radius: 15px; background: white; padding: 25px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: 100%;
+        .btn-checkin {
+            background: var(--kvon-orange); color: white;
+            border: none; border-radius: 10px; padding: 11px 32px;
+            font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s;
         }
-        .stats-label { font-size: 0.75rem; font-weight: 800; color: #888; text-uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-        .stats-value { font-size: 1.8rem; font-weight: 700; color: var(--kvon-blue); }
+        .btn-checkout {
+            background: #dc3545; color: white;
+            border: none; border-radius: 10px; padding: 11px 32px;
+            font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s;
+        }
+        .btn-checkin:hover { background: #d4670f; }
+        .btn-checkout:hover { background: #b02a37; }
 
-        /* Table Area */
-        .table-card { border-radius: 20px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); background: white; }
+        /* ---- STATS CARD ---- */
+        .stats-card {
+            background: white; border-radius: 14px; padding: 22px 25px;
+            border-left: 5px solid var(--kvon-orange);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        .stats-label { font-size: 0.72rem; font-weight: 700; color: #999; letter-spacing: 1px; text-transform: uppercase; }
+        .stats-value { font-size: 1.9rem; font-weight: 700; color: var(--kvon-blue); margin-top: 4px; }
+
+        /* ---- CAMERA BOX ---- */
+        #camera-area {
+            background: white; border-radius: 18px; padding: 25px;
+            margin-bottom: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            text-align: center; display: none;
+        }
+        #video {
+            width: 300px; border-radius: 16px; background: #000;
+            margin: 12px auto 18px; display: block;
+            border: 4px solid #eee;
+        }
+
+        /* ---- TABLE CARD ---- */
+        .table-card {
+            background: white; border-radius: 16px; padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .table thead th {
+            font-size: 0.75rem; font-weight: 700; color: #888;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;
+        }
+        .table tbody td { vertical-align: middle; padding: 12px 8px; font-size: 0.88rem; }
+        .badge-ongoing { background: #fff8e1; color: #b8860b; border: 1px solid #f0c040; border-radius: 20px; padding: 4px 12px; font-size: 0.78rem; font-weight: 600; }
+        .badge-done { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; border-radius: 20px; padding: 4px 12px; font-size: 0.78rem; font-weight: 600; }
+        .selfie-link { color: var(--kvon-blue); text-decoration: none; font-weight: 600; font-size: 0.85rem; }
+        .selfie-link:hover { color: var(--kvon-orange); }
+
+        .btn-loading { opacity: 0.65; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="logo-round">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="KVON">
-        </div>
-
-        <nav>
-            <a href="/dashboard" class="nav-item active-nav"><i class="fa fa-tachometer-alt me-2"></i> Dashboard</a>
-            <a href="/my-attendance" class="nav-item"><i class="fa fa-list-check me-2"></i> My Attendance</a>
-            <a href="/daily-login-hrs" class="nav-item"><i class="fa fa-clock-rotate-left me-2"></i> Daily Login Hrs</a>
-        </nav>
-        
-        <div class="profile-bottom">
-            <div class="d-flex align-items-center mb-3" data-bs-toggle="modal" data-bs-target="#profileModal" style="cursor: pointer;">
-                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-img-gol me-3">
-                <div class="overflow-hidden">
-                    <h6 class="mb-0 fw-bold text-white text-truncate">{{ current_user.first_name }}</h6>
-                    <small style="color: var(--kvon-orange);">ID: {{ current_user.emp_id }}</small>
-                </div>
-            </div>
-            <a href="/logout" class="btn btn-sm btn-outline-light w-100 rounded-pill">Sign Out</a>
-        </div>
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="logo-round">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="KVON">
     </div>
 
-    <div class="main-content">
-        <div class="header-action">
+    <nav>
+        <a href="/dashboard" class="nav-item active-nav">
+            <i class="fa fa-th-large"></i> Dashboard
+        </a>
+        <div class="nav-divider"></div>
+        <a href="/download/excel" class="nav-item">
+            <i class="fa fa-file-excel" style="color:#1d6f42"></i> Daily Login Excel
+        </a>
+        <a href="/download/pdf" class="nav-item">
+            <i class="fa fa-file-pdf" style="color:#dc3545"></i> Attendance PDF
+        </a>
+    </nav>
+
+    <div class="profile-bottom">
+        <div class="d-flex align-items-center mb-3">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-img-gol me-3">
             <div>
-                <h4 class="fw-bold mb-0 text-dark">Portal Summary</h4>
-                <small class="text-muted fw-medium">{{ today_date }}</small>
-            </div>
-            <div class="d-flex align-items-center">
-                {% if active %}
-                    <span class="badge bg-success-subtle text-success me-3 px-3 py-2 border rounded-pill">ON DUTY</span>
-                    <button onclick="handlePunch()" class="btn btn-out btn-check shadow-sm">Check Out</button>
-                {% else %}
-                    <span class="badge bg-secondary-subtle text-secondary me-3 px-3 py-2 border rounded-pill">OFF DUTY</span>
-                    <button onclick="handlePunch()" class="btn btn-in btn-check shadow-sm">Check In</button>
-                {% endif %}
+                <div class="fw-bold text-white">{{ current_user.first_name }}</div>
+                <small style="color: var(--kvon-orange);">ID: {{ current_user.emp_id }}</small>
             </div>
         </div>
+        <a href="/logout" class="btn btn-sm btn-outline-light w-100 rounded-pill">Sign Out</a>
+    </div>
+</div>
 
-        <div class="row g-4 mb-5">
-            <div class="col-md-4">
-                <div class="card-stats">
-                    <div class="stats-label">Today's Total</div>
-                    <div class="stats-value">{{ stats.today }}</div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card-stats" style="border-left-color: var(--kvon-blue);">
-                    <div class="stats-label">Yesterday</div>
-                    <div class="stats-value">{{ stats.yesterday }}</div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card-stats">
-                    <div class="stats-label">Weekly Total</div>
-                    <div class="stats-value">{{ stats.weekly }}</div>
-                </div>
-            </div>
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <!-- Header -->
+    <div class="header-card">
+        <div>
+            <h4 class="fw-bold mb-0 text-dark">Portal Summary</h4>
+            <small class="text-muted">{{ today_date }}</small>
         </div>
-
-        <div id="camera-area" class="card p-4 mb-5 d-none text-center bg-white shadow-lg border-0" style="border-radius: 25px;">
-            <h5 class="fw-bold mb-3">Verification Required</h5>
-            <video id="video" autoplay playsinline style="width: 320px; border-radius: 20px; background: #000; margin: 0 auto 20px; border: 5px solid #eee;"></video>
-            <canvas id="canvas" class="d-none"></canvas>
-            <div class="d-flex justify-content-center gap-3">
-                <button class="btn btn-primary px-5 rounded-pill fw-bold py-2" onclick="captureAndSend()">CONFIRM ATTENDANCE</button>
-                <button class="btn btn-light px-4 rounded-pill border" onclick="location.reload()">Cancel</button>
-            </div>
-        </div>
-
-        <div class="card table-card">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h6 class="fw-bold mb-0 text-dark"><i class="fa fa-history me-2 text-primary"></i>Recent Logs</h6>
-                    <a href="/my-attendance" class="text-primary text-decoration-none small fw-bold">View Detailed Reports →</a>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr class="small text-uppercase text-muted">
-                                <th>Date</th><th>Check-In</th><th>Check-Out</th><th>Verification</th>
-                            </tr>
-                        </thead>
-                        <tbody class="small">
-                            {% for log in logs %}
-                            <tr>
-                                <td class="fw-medium">{{ log.check_in.strftime('%d %b, %Y') }}</td>
-                                <td class="text-primary fw-bold">{{ log.check_in.strftime('%I:%M %p') }}</td>
-                                <td>{{ log.check_out.strftime('%I:%M %p') if log.check_out else '--:--' }}</td>
-                                <td><a href="/static/uploads/{{ log.selfie }}" target="_blank" class="badge bg-light text-dark border text-decoration-none p-2"><i class="fa fa-image me-1"></i>View Selfie</a></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="d-flex align-items-center gap-3">
+            {% if active %}
+                <span class="badge px-3 py-2 rounded-pill" style="background:#d4edda; color:#155724; border:1px solid #c3e6cb; font-size:0.82rem;">ON DUTY</span>
+                <button onclick="handlePunch()" class="btn-checkout">Check Out</button>
+            {% else %}
+                <span class="badge px-3 py-2 rounded-pill" style="background:#e2e3e5; color:#383d41; border:1px solid #d6d8db; font-size:0.82rem;">OFF DUTY</span>
+                <button onclick="handlePunch()" class="btn-checkin">Check In</button>
+            {% endif %}
         </div>
     </div>
 
-    <div class="modal fade" id="profileModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content p-4" style="border-radius: 25px; border: none;">
-                <form action="/update_profile" method="POST">
-                    <h5 class="fw-bold text-center mb-4">Update Employee Profile</h5>
-                    <div class="mb-3">
-                        <label class="small fw-bold">First Name</label>
-                        <input type="text" name="first_name" class="form-control rounded-pill" value="{{ current_user.first_name }}">
-                    </div>
-                    <div class="mb-4">
-                        <label class="small fw-bold">Last Name</label>
-                        <input type="text" name="last_name" class="form-control rounded-pill" value="{{ current_user.last_name }}">
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow">SAVE CHANGES</button>
-                </form>
-            </div>
+    <!-- Today's Total Hours -->
+    <div class="stats-card">
+        <div class="stats-label">Today's Total Hours</div>
+        <div class="stats-value">{{ stats.today }}</div>
+    </div>
+
+    <!-- Camera Box -->
+    <div id="camera-area">
+        <h5 class="fw-bold mb-1"><i class="fa fa-camera me-2 text-primary"></i>Verification Required</h5>
+        <div id="location-status" class="mb-2">
+            <span class="badge bg-warning text-dark">
+                <i class="fa fa-location-dot me-1"></i> Location fetch ho rahi hai...
+            </span>
+        </div>
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <div class="d-flex justify-content-center gap-3">
+            <button id="capture-btn" onclick="captureAndSend()" class="btn btn-primary rounded-pill px-5 py-2 fw-bold">
+                <i class="fa fa-camera me-2"></i>CONFIRM ATTENDANCE
+            </button>
+            <button onclick="cancelPunch()" class="btn btn-light rounded-pill px-4 border">
+                Cancel
+            </button>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        let locData = "0,0";
-        const v = document.getElementById('video');
+    <!-- Recent Activities Table -->
+    <div class="table-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0"><i class="fa fa-clock-rotate-left me-2 text-primary"></i>Recent Activities</h6>
+            <a href="/my-attendance" class="text-primary small fw-bold text-decoration-none">View All →</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>In Time</th>
+                        <th>Out Time</th>
+                        <th>Verification</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td class="fw-medium">{{ log.check_in.strftime('%d %b, %Y') }}</td>
+                        <td class="fw-bold text-primary">{{ log.check_in.strftime('%I:%M %p') }}</td>
+                        <td>{{ log.check_out.strftime('%I:%M %p') if log.check_out else '--:--' }}</td>
+                        <td>
+                            <a href="/static/uploads/{{ log.selfie }}" target="_blank" class="selfie-link">
+                                <i class="fa fa-image me-1"></i>View Selfie
+                            </a>
+                        </td>
+                        <td>
+                            {% if log.check_out %}
+                                <span class="badge-done">Completed</span>
+                            {% else %}
+                                <span class="badge-ongoing">Ongoing</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not logs %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">Abhi tak koi attendance nahi</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-        async function handlePunch() {
-            document.getElementById('camera-area').classList.remove('d-none');
-            window.scrollTo({ top: 150, behavior: 'smooth' });
-            
-            navigator.geolocation.getCurrentPosition(p => {
-                locData = `${p.coords.latitude}, ${p.coords.longitude}`;
-            }, e => console.log("GPS Denied"));
+</div>
 
-            try {
-                const s = await navigator.mediaDevices.getUserMedia({ video: true });
-                v.srcObject = s;
-            } catch (err) {
-                alert("Camera access is mandatory for attendance verification!");
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // KVON TECH — Attendance JS (Final Clean)
+
+    let streamRef = null;
+    let locData = null;
+
+    // Location Promise — await se sahi coordinates aayenge
+    function getLocation() {
+        return new Promise((resolve) => {
+            if (!navigator.geolocation) {
+                resolve("Location not supported");
+                return;
             }
+            navigator.geolocation.getCurrentPosition(
+                (pos) => resolve(`${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`),
+                () => resolve("Location Denied"),
+                { timeout: 10000, maximumAge: 0 }
+            );
+        });
+    }
+
+    // Check In / Check Out button
+    async function handlePunch() {
+        const camArea = document.getElementById('camera-area');
+        camArea.style.display = 'block';
+        window.scrollTo({ top: 200, behavior: 'smooth' });
+
+        // Location background mein fetch karo
+        locData = null;
+        document.getElementById('location-status').innerHTML =
+            '<span class="badge bg-warning text-dark"><i class="fa fa-location-dot me-1"></i> Location fetch ho rahi hai...</span>';
+
+        getLocation().then((result) => {
+            locData = result;
+            if (result === "Location Denied" || result === "Location not supported") {
+                document.getElementById('location-status').innerHTML =
+                    '<span class="badge bg-danger text-white"><i class="fa fa-triangle-exclamation me-1"></i> Location nahi mili — GPS on karo</span>';
+            } else {
+                document.getElementById('location-status').innerHTML =
+                    '<span class="badge bg-success text-white"><i class="fa fa-location-dot me-1"></i> Location mil gayi ✓</span>';
+            }
+        });
+
+        // Camera start karo
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            streamRef = stream;
+            document.getElementById('video').srcObject = stream;
+        } catch (err) {
+            alert("Camera access mandatory hai attendance ke liye!\n\nError: " + err.message);
+            camArea.style.display = 'none';
+        }
+    }
+
+    // Camera band karo
+    function stopCamera() {
+        if (streamRef) {
+            streamRef.getTracks().forEach(t => t.stop());
+            streamRef = null;
+        }
+        document.getElementById('video').srcObject = null;
+    }
+
+    // Cancel
+    function cancelPunch() {
+        stopCamera();
+        locData = null;
+        document.getElementById('camera-area').style.display = 'none';
+    }
+
+    // Selfie lo + server ko bhejo
+    async function captureAndSend() {
+        const v = document.getElementById('video');
+        const cn = document.getElementById('canvas');
+        const btn = document.getElementById('capture-btn');
+
+        if (!v.videoWidth || !v.videoHeight) {
+            alert("Camera ready nahi hai, ek second ruko!");
+            return;
         }
 
-        async function captureAndSend() {
-            const cn = document.getElementById('canvas');
-            cn.width = v.videoWidth; cn.height = v.videoHeight;
-            cn.getContext('2d').drawImage(v, 0, 0);
-            const img = cn.toDataURL('image/png');
+        btn.classList.add('btn-loading');
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Processing...';
 
+        // Selfie capture
+        cn.width = v.videoWidth;
+        cn.height = v.videoHeight;
+        cn.getContext('2d').drawImage(v, 0, 0);
+        const selfieImg = cn.toDataURL('image/png');
+
+        // Location abhi bhi aa rahi ho to wait karo
+        if (locData === null) {
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Location wait...';
+            locData = await getLocation();
+        }
+
+        stopCamera();
+
+        try {
             const resp = await fetch('/punch', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ selfie: img, location: locData })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ selfie: selfieImg, location: locData })
             });
 
-            if(resp.ok) { location.reload(); }
+            const result = await resp.json();
+
+            if (resp.ok && result.status === 'success') {
+                location.reload();
+            } else {
+                alert("Attendance failed!\nReason: " + (result.message || "Unknown error"));
+                btn.classList.remove('btn-loading');
+                btn.innerHTML = '<i class="fa fa-camera me-2"></i>CONFIRM ATTENDANCE';
+            }
+        } catch (err) {
+            alert("Network error!\nDetails: " + err.message);
+            btn.classList.remove('btn-loading');
+            btn.innerHTML = '<i class="fa fa-camera me-2"></i>CONFIRM ATTENDANCE';
         }
-    </script>
+    }
+</script>
 </body>
 </html>
