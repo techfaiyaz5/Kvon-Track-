@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kvontrack-deployment
+  name: kvontrack-gemini
   labels:
     app: kvontrack
 spec:
