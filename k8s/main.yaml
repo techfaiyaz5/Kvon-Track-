@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: student-app
-        image: techfaiyaz5/kvontrack-gemini:19
+        image: techfaiyaz5/kvontrack-gemini:21
         ports:
         - containerPort: 5000
         resources:
