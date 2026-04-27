@@ -117,7 +117,7 @@ def login():
 
         if user and user.password == password and user.role == role_type:
             if user.status != 'approved':
-                flash('Your account is pending admin approval!', 'warning!')
+                flash('Your account is pending admin approval!', 'warning')
                 return redirect(url_for('login'))
             login_user(user)
             return redirect(url_for('dashboard'))
