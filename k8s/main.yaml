@@ -22,11 +22,11 @@ spec:
           runAsUser: 0  # Isse SQLite file banane ki permission mil jayegi
         resources:
           requests:
-            cpu: "50m"
-            memory: "64Mi"
-          limits:
             cpu: "100m"
             memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
 ---
 # 2. Service (NodePort)
 apiVersion: v1
