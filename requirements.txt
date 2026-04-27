@@ -1,4 +1,6 @@
-flask
-mysql-connector-python
 gunicorn
+pandas
+flask
+flask_sqlalchemy
+mysql-connector-python
 pandas
