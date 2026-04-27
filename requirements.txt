@@ -1,6 +1,10 @@
-gunicorn
-pandas
 flask
-flask_sqlalchemy
+flask-sqlalchemy
+flask-login
+pandas
+openpyxl
+reportlab
+pymysql
+gunicorn
 mysql-connector-python
 pandas

@@ -1,10 +1,10 @@
-# 1. Deployment (Resource limits zaroori hain HPA ke liye)
+# 1. Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kvontrack-gemini
 spec:
-  replicas: 2
+  replicas: 1  # SQLite ke liye abhi 1 hi rakho taaki data mismatch na ho
   selector:
     matchLabels:
       app: kvontrack-gemini
@@ -15,9 +15,11 @@ spec:
     spec:
       containers:
       - name: kvontrack-gemini
-        image: techfaiyaz5/kvontrack-gemini:${IMAGE_TAG}
+        image: techfaiyaz5/kvontrack-gemini:121  # Maine tag fix kar diya hai
         ports:
         - containerPort: 5000
+        securityContext:
+          runAsUser: 0  # Isse SQLite file banane ki permission mil jayegi
         resources:
           requests:
             cpu: "50m"
@@ -26,7 +28,7 @@ spec:
             cpu: "100m"
             memory: "128Mi"
 ---
-# 2. Service (NodePort taaki browser mein khul sake)
+# 2. Service (NodePort)
 apiVersion: v1
 kind: Service
 metadata:
@@ -51,7 +53,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: kvontrack-gemini
-  minReplicas: 2
+  minReplicas: 1 # Jab tak MySQL nahi hai, ise 1 hi rehne do
   maxReplicas: 5
   metrics:
   - type: Resource
