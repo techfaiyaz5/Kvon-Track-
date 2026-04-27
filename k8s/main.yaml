@@ -18,6 +18,9 @@ spec:
         image: techfaiyaz5/kvontrack-gemini:121  # Maine tag fix kar diya hai
         ports:
         - containerPort: 5000
+        env:
+        - name: TZ
+          value: "Asia/Kolkata"
         securityContext:
           runAsUser: 0  # Isse SQLite file banane ki permission mil jayegi
         resources:
