@@ -54,15 +54,16 @@ class Attendance(db.Model):
     selfie = db.Column(db.String(255))
     total_seconds = db.Column(db.Integer, default=0)
 
-class UserTask(db.Model):
+class Task(db.Model):
+    """Daily Tasks created by Employee"""
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    task_description = db.Column(db.Text, nullable=False)
-    date = db.Column(db.String(20))
-    time = db.Column(db.String(20))
-
-with app.app_context():
-    db.create_all()
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    due_date = db.Column(db.String(20), nullable=True)
+    due_time = db.Column(db.String(10), nullable=True)
+    status = db.Column(db.String(20), default='pending')  # pending or done
+    created_at = db.Column(db.DateTime, default=datetime.now)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -177,11 +178,15 @@ def dashboard():
         user_id=current_user.id, check_out=None
     ).first()
 
+    # Tasks — aaj ke + pending purane
+    tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.created_at.desc()).limit(10).all()
+
     return render_template('emp_dashboard.html',
         logs=recent_activity,
         active=active_session,
         stats=stats,
-        today_date=date_display
+        today_date=date_display,
+        tasks=tasks
     )
 
 # --- ATTENDANCE PUNCH ---
@@ -225,6 +230,43 @@ def punch():
         db.session.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
 
+# --- TASK ROUTES ---
+
+@app.route('/task/add', methods=['POST'])
+@login_required
+def task_add():
+    title = request.form.get('title', '').strip()
+    if not title:
+        return jsonify({"status": "error", "message": "Title required"}), 400
+    task = Task(
+        user_id=current_user.id,
+        title=title,
+        description=request.form.get('description', '').strip(),
+        due_date=request.form.get('due_date', ''),
+        due_time=request.form.get('due_time', ''),
+        status='pending'
+    )
+    db.session.add(task)
+    db.session.commit()
+    flash("Task added!", "success")
+    return redirect(url_for('dashboard'))
+
+@app.route('/task/toggle/<int:task_id>')
+@login_required
+def task_toggle(task_id):
+    task = Task.query.filter_by(id=task_id, user_id=current_user.id).first_or_404()
+    task.status = 'done' if task.status == 'pending' else 'pending'
+    db.session.commit()
+    return redirect(url_for('dashboard'))
+
+@app.route('/task/delete/<int:task_id>')
+@login_required
+def task_delete(task_id):
+    task = Task.query.filter_by(id=task_id, user_id=current_user.id).first_or_404()
+    db.session.delete(task)
+    db.session.commit()
+    return redirect(url_for('dashboard'))
+
 # --- ADMIN ACTIONS ---
 
 @app.route('/admin/approve/<int:user_id>')
@@ -261,7 +303,6 @@ def reports():
     ).order_by(Attendance.id.desc()).all()
     return render_template('attendance_view.html', logs=logs)
 
-# --- DOWNLOAD EXCEL ---
 @app.route('/download/excel')
 @login_required
 def download_excel():
@@ -288,7 +329,6 @@ def download_excel():
     return send_file(output, as_attachment=True,
                      download_name=f"Attendance_{current_user.emp_id}.xlsx")
 
-# --- DOWNLOAD PDF ---
 @app.route('/download/pdf')
 @login_required
 def download_pdf():
@@ -318,11 +358,10 @@ def download_pdf():
         if y < 60:
             p.showPage()
             y = 750
-        status = "Completed" if l.check_out else "Ongoing"
         p.drawString(100, y, l.check_in.strftime('%d %b %Y'))
         p.drawString(200, y, l.check_in.strftime('%I:%M %p'))
         p.drawString(290, y, l.check_out.strftime('%I:%M %p') if l.check_out else "--:--")
-        p.drawString(380, y, status)
+        p.drawString(380, y, "Completed" if l.check_out else "Ongoing")
         y -= 18
 
     p.save()
@@ -335,26 +374,9 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-from datetime import datetime
-
-@app.route('/submit_task', methods=['POST'])
-@login_required # Taaki sirf logged-in user task dalo sake
-def submit_task():
-    task_text = request.form.get('task')
-    if task_text:
-        new_task = UserTask(
-            user_id=current_user.id, 
-            task_description=task_text, 
-            date=datetime.now().strftime("%d %b, %Y"),
-            time=datetime.now().strftime("%I:%M %p")
-        )
-        db.session.add(new_task)
-        db.session.commit()
-    return redirect(url_for('dashboard')) # Wapas dashboard par bhej dega
-
 # --- APP RUNNER ---
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, port=5000)
