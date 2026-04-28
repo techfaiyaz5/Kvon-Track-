@@ -54,6 +54,16 @@ class Attendance(db.Model):
     selfie = db.Column(db.String(255))
     total_seconds = db.Column(db.Integer, default=0)
 
+class UserTask(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    task_description = db.Column(db.Text, nullable=False)
+    date = db.Column(db.String(20))
+    time = db.Column(db.String(20))
+
+with app.app_context():
+    db.create_all()
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -324,6 +334,23 @@ def download_pdf():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+from datetime import datetime
+
+@app.route('/submit_task', methods=['POST'])
+@login_required # Taaki sirf logged-in user task dalo sake
+def submit_task():
+    task_text = request.form.get('task')
+    if task_text:
+        new_task = UserTask(
+            user_id=current_user.id, 
+            task_description=task_text, 
+            date=datetime.now().strftime("%d %b, %Y"),
+            time=datetime.now().strftime("%I:%M %p")
+        )
+        db.session.add(new_task)
+        db.session.commit()
+    return redirect(url_for('dashboard')) # Wapas dashboard par bhej dega
 
 # --- APP RUNNER ---
 
