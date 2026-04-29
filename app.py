@@ -9,6 +9,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from sqlalchemy import or_, func
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
 
 # --- APP INITIALIZATION ---
 app = Flask(__name__)
@@ -178,15 +179,30 @@ def dashboard():
         user_id=current_user.id, check_out=None
     ).first()
 
-    # Tasks — aaj ke + pending purane
-    tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.created_at.desc()).limit(10).all()
+    # Task filter by date — default aaj ki date
+    task_filter_date = request.args.get('task_date', str(today_date))
+
+    tasks = Task.query.filter_by(
+        user_id=current_user.id
+    ).filter(
+        Task.due_date == task_filter_date
+    ).order_by(Task.created_at.desc()).all()
+
+    # Saari unique dates jisme tasks hain — dropdown ke liye
+    all_task_dates = db.session.query(Task.due_date).filter_by(
+        user_id=current_user.id
+    ).filter(Task.due_date != None, Task.due_date != '').distinct().order_by(Task.due_date.desc()).all()
+    all_task_dates = [d[0] for d in all_task_dates]
 
     return render_template('emp_dashboard.html',
         logs=recent_activity,
         active=active_session,
         stats=stats,
         today_date=date_display,
-        tasks=tasks
+        tasks=tasks,
+        task_filter_date=task_filter_date,
+        all_task_dates=all_task_dates,
+        today_str=str(today_date)
     )
 
 # --- ATTENDANCE PUNCH ---
@@ -237,7 +253,8 @@ def punch():
 def task_add():
     title = request.form.get('title', '').strip()
     if not title:
-        return jsonify({"status": "error", "message": "Title required"}), 400
+        flash("Task title required!", "danger")
+        return redirect(url_for('dashboard'))
     task = Task(
         user_id=current_user.id,
         title=title,
@@ -249,7 +266,9 @@ def task_add():
     db.session.add(task)
     db.session.commit()
     flash("Task added!", "success")
-    return redirect(url_for('dashboard'))
+    # Redirect back to same date filter
+    due_date = request.form.get('due_date', '')
+    return redirect(url_for('dashboard', task_date=due_date))
 
 @app.route('/task/toggle/<int:task_id>')
 @login_required
@@ -257,15 +276,141 @@ def task_toggle(task_id):
     task = Task.query.filter_by(id=task_id, user_id=current_user.id).first_or_404()
     task.status = 'done' if task.status == 'pending' else 'pending'
     db.session.commit()
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('dashboard', task_date=task.due_date))
 
 @app.route('/task/delete/<int:task_id>')
 @login_required
 def task_delete(task_id):
     task = Task.query.filter_by(id=task_id, user_id=current_user.id).first_or_404()
+    due_date = task.due_date
     db.session.delete(task)
     db.session.commit()
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('dashboard', task_date=due_date))
+
+# --- TASK PDF DOWNLOAD ---
+
+@app.route('/task/download-pdf')
+@login_required
+def task_download_pdf():
+    filter_date = request.args.get('date', str(datetime.now().date()))
+
+    tasks = Task.query.filter_by(user_id=current_user.id).filter(
+        Task.due_date == filter_date
+    ).order_by(Task.created_at.asc()).all()
+
+    output = BytesIO()
+    p = canvas.Canvas(output, pagesize=letter)
+    width, height = letter
+
+    # --- Header ---
+    p.setFillColor(colors.HexColor('#1d426e'))
+    p.rect(0, height - 80, width, 80, fill=True, stroke=False)
+
+    p.setFillColor(colors.white)
+    p.setFont("Helvetica-Bold", 18)
+    p.drawString(40, height - 40, "KVON TECH — Daily Task Report")
+    p.setFont("Helvetica", 11)
+    p.drawString(40, height - 60, f"Employee: {current_user.first_name} {current_user.last_name}   |   ID: {current_user.emp_id}   |   Date: {filter_date}")
+
+    # --- Stats bar ---
+    total = len(tasks)
+    done = sum(1 for t in tasks if t.status == 'done')
+    pending = total - done
+
+    p.setFillColor(colors.HexColor('#f47920'))
+    p.rect(0, height - 115, width, 35, fill=True, stroke=False)
+    p.setFillColor(colors.white)
+    p.setFont("Helvetica-Bold", 11)
+    p.drawString(40, height - 100, f"Total Tasks: {total}     Completed: {done}     Pending: {pending}")
+
+    # --- Table header ---
+    y = height - 150
+    p.setFillColor(colors.HexColor('#f0f2f5'))
+    p.rect(30, y - 5, width - 60, 25, fill=True, stroke=False)
+    p.setFillColor(colors.HexColor('#1d426e'))
+    p.setFont("Helvetica-Bold", 10)
+    p.drawString(40, y + 6, "#")
+    p.drawString(70, y + 6, "Task Title")
+    p.drawString(310, y + 6, "Description")
+    p.drawString(450, y + 6, "Time")
+    p.drawString(510, y + 6, "Status")
+
+    y -= 20
+
+    # --- Task rows ---
+    for i, task in enumerate(tasks, 1):
+        if y < 80:
+            p.showPage()
+            y = height - 60
+
+        # Alternating row background
+        if i % 2 == 0:
+            p.setFillColor(colors.HexColor('#fafafa'))
+            p.rect(30, y - 8, width - 60, 24, fill=True, stroke=False)
+
+        # Status color dot
+        if task.status == 'done':
+            p.setFillColor(colors.HexColor('#2e7d32'))
+        else:
+            p.setFillColor(colors.HexColor('#e65100'))
+        p.circle(35, y + 5, 4, fill=True, stroke=False)
+
+        p.setFillColor(colors.black)
+        p.setFont("Helvetica", 10)
+        p.drawString(40, y + 2, str(i))
+
+        # Title — truncate if too long
+        title_text = task.title[:35] + "..." if len(task.title) > 35 else task.title
+        if task.status == 'done':
+            p.setFillColor(colors.HexColor('#888888'))
+        else:
+            p.setFillColor(colors.black)
+        p.setFont("Helvetica-Bold" if task.status == 'pending' else "Helvetica", 10)
+        p.drawString(70, y + 2, title_text)
+
+        # Description
+        p.setFillColor(colors.HexColor('#555555'))
+        p.setFont("Helvetica", 9)
+        desc_text = (task.description or "")[:30] + ("..." if task.description and len(task.description) > 30 else "")
+        p.drawString(310, y + 2, desc_text)
+
+        # Time
+        p.setFillColor(colors.HexColor('#555555'))
+        p.drawString(450, y + 2, task.due_time or "--:--")
+
+        # Status badge
+        if task.status == 'done':
+            p.setFillColor(colors.HexColor('#e8f5e9'))
+            p.roundRect(500, y - 3, 52, 16, 4, fill=True, stroke=False)
+            p.setFillColor(colors.HexColor('#2e7d32'))
+            p.setFont("Helvetica-Bold", 9)
+            p.drawString(507, y + 2, "DONE")
+        else:
+            p.setFillColor(colors.HexColor('#fff3e0'))
+            p.roundRect(500, y - 3, 52, 16, 4, fill=True, stroke=False)
+            p.setFillColor(colors.HexColor('#e65100'))
+            p.setFont("Helvetica-Bold", 9)
+            p.drawString(503, y + 2, "PENDING")
+
+        y -= 28
+
+    # --- Footer ---
+    p.setFillColor(colors.HexColor('#f0f2f5'))
+    p.rect(0, 0, width, 30, fill=True, stroke=False)
+    p.setFillColor(colors.HexColor('#888888'))
+    p.setFont("Helvetica", 8)
+    p.drawString(40, 10, f"Generated on {datetime.now().strftime('%d %b %Y, %I:%M %p')}   |   KVON TECH Enterprise")
+    p.drawRightString(width - 40, 10, f"Page 1")
+
+    if not tasks:
+        p.setFillColor(colors.HexColor('#aaaaaa'))
+        p.setFont("Helvetica", 13)
+        p.drawCentredString(width / 2, height / 2, f"No tasks found for {filter_date}")
+
+    p.save()
+    output.seek(0)
+    return send_file(output, as_attachment=True,
+                     download_name=f"Tasks_{current_user.emp_id}_{filter_date}.pdf")
 
 # --- ADMIN ACTIONS ---
 
@@ -292,7 +437,7 @@ def update_profile():
     flash("Profile updated successfully!", "success")
     return redirect(url_for('dashboard'))
 
-# --- REPORTS ---
+# --- ATTENDANCE REPORTS ---
 
 @app.route('/my-attendance')
 @app.route('/daily-login-hrs')
