@@ -38,15 +38,9 @@
             text-decoration: none; border-radius: 10px;
             transition: 0.25s; margin-bottom: 6px; font-size: 0.9rem;
         }
-        .nav-item:hover, .active-nav {
-            background: var(--kvon-orange); color: white; font-weight: 600;
-        }
-        .nav-divider {
-            border-top: 1px solid rgba(255,255,255,0.12);
-            margin: 14px 0;
-        }
+        .nav-item:hover, .active-nav { background: var(--kvon-orange); color: white; font-weight: 600; }
+        .nav-divider { border-top: 1px solid rgba(255,255,255,0.12); margin: 14px 0; }
 
-        /* Profile bottom */
         .profile-bottom {
             margin-top: auto; padding-top: 20px;
             border-top: 1px solid rgba(255,255,255,0.12);
@@ -93,14 +87,14 @@
         }
         #video {
             width: 300px; border-radius: 16px; background: #000;
-            margin: 12px auto 18px; display: block;
-            border: 4px solid #eee;
+            margin: 12px auto 18px; display: block; border: 4px solid #eee;
         }
 
         /* ---- TABLE CARD ---- */
         .table-card {
             background: white; border-radius: 16px; padding: 25px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
         }
         .table thead th {
             font-size: 0.75rem; font-weight: 700; color: #888;
@@ -108,12 +102,82 @@
             border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;
         }
         .table tbody td { vertical-align: middle; padding: 12px 8px; font-size: 0.88rem; }
-        .badge-ongoing { background: #fff8e1; color: #b8860b; border: 1px solid #f0c040; border-radius: 20px; padding: 4px 12px; font-size: 0.78rem; font-weight: 600; }
-        .badge-done { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; border-radius: 20px; padding: 4px 12px; font-size: 0.78rem; font-weight: 600; }
-        .selfie-link { color: var(--kvon-blue); text-decoration: none; font-weight: 600; font-size: 0.85rem; }
+        .badge-ongoing  { background:#fff8e1; color:#b8860b; border:1px solid #f0c040; border-radius:20px; padding:4px 12px; font-size:0.78rem; font-weight:600; }
+        .badge-done     { background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7; border-radius:20px; padding:4px 12px; font-size:0.78rem; font-weight:600; }
+        .badge-pending  { background:#fff3e0; color:#e65100; border:1px solid #ffcc80; border-radius:20px; padding:4px 12px; font-size:0.78rem; font-weight:600; }
+        .selfie-link { color: var(--kvon-blue); text-decoration:none; font-weight:600; font-size:0.85rem; }
         .selfie-link:hover { color: var(--kvon-orange); }
 
+        /* ---- TASK SECTION ---- */
+        .task-card {
+            background: white; border-radius: 16px; padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .task-form-box {
+            background: #f8f9fc; border-radius: 12px; padding: 20px;
+            margin-bottom: 20px; border: 1px solid #e8eaf0;
+        }
+        .task-form-box input, .task-form-box textarea {
+            border-radius: 8px; border: 1px solid #dde0e8;
+            font-size: 0.88rem; padding: 9px 14px; width: 100%;
+            outline: none; transition: 0.2s;
+        }
+        .task-form-box input:focus, .task-form-box textarea:focus {
+            border-color: var(--kvon-orange); box-shadow: 0 0 0 3px rgba(244,121,32,0.1);
+        }
+        .btn-add-task {
+            background: var(--kvon-blue); color: white;
+            border: none; border-radius: 8px; padding: 10px 24px;
+            font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: 0.2s;
+        }
+        .btn-add-task:hover { background: #163558; }
+
+        /* Task list items */
+        .task-item {
+            display: flex; align-items: flex-start; gap: 14px;
+            padding: 14px 16px; border-radius: 10px;
+            background: #fafafa; border: 1px solid #eee;
+            margin-bottom: 10px; transition: 0.2s;
+        }
+        .task-item:hover { border-color: var(--kvon-orange); background: #fff8f3; }
+        .task-item.done-item { opacity: 0.6; background: #f5fdf6; border-color: #c8e6c9; }
+
+        .task-checkbox {
+            width: 20px; height: 20px; border-radius: 50%;
+            border: 2px solid var(--kvon-orange);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0; margin-top: 2px;
+            text-decoration: none; transition: 0.2s;
+            background: white;
+        }
+        .task-checkbox.checked {
+            background: #2e7d32; border-color: #2e7d32; color: white;
+        }
+        .task-checkbox:hover { transform: scale(1.1); }
+
+        .task-title { font-weight: 600; font-size: 0.9rem; color: #1a1a2e; }
+        .task-title.striked { text-decoration: line-through; color: #999; }
+        .task-desc { font-size: 0.8rem; color: #888; margin-top: 2px; }
+        .task-meta { font-size: 0.75rem; color: #aaa; margin-top: 4px; }
+        .task-meta span { margin-right: 12px; }
+
+        .btn-del-task {
+            margin-left: auto; background: none; border: none;
+            color: #ccc; cursor: pointer; font-size: 1rem;
+            flex-shrink: 0; padding: 2px 6px; border-radius: 6px;
+            transition: 0.2s;
+        }
+        .btn-del-task:hover { color: #dc3545; background: #fff0f0; }
+
         .btn-loading { opacity: 0.65; pointer-events: none; }
+
+        /* Add Task toggle button */
+        .btn-add-toggle {
+            background: var(--kvon-orange); color: white;
+            border: none; border-radius: 8px; padding: 8px 20px;
+            font-weight: 600; font-size: 0.85rem; cursor: pointer;
+        }
+        .task-empty { text-align: center; color: #bbb; padding: 20px 0; font-size: 0.88rem; }
     </style>
 </head>
 <body>
@@ -123,7 +187,6 @@
     <div class="logo-round">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="KVON">
     </div>
-
     <nav>
         <a href="/dashboard" class="nav-item active-nav">
             <i class="fa fa-th-large"></i> Dashboard
@@ -136,7 +199,6 @@
             <i class="fa fa-file-pdf" style="color:#dc3545"></i> Attendance PDF
         </a>
     </nav>
-
     <div class="profile-bottom">
         <div class="d-flex align-items-center mb-3">
             <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-img-gol me-3">
@@ -160,10 +222,10 @@
         </div>
         <div class="d-flex align-items-center gap-3">
             {% if active %}
-                <span class="badge px-3 py-2 rounded-pill" style="background:#d4edda; color:#155724; border:1px solid #c3e6cb; font-size:0.82rem;">ON DUTY</span>
+                <span class="badge px-3 py-2 rounded-pill" style="background:#d4edda;color:#155724;border:1px solid #c3e6cb;font-size:0.82rem;">ON DUTY</span>
                 <button onclick="handlePunch()" class="btn-checkout">Check Out</button>
             {% else %}
-                <span class="badge px-3 py-2 rounded-pill" style="background:#e2e3e5; color:#383d41; border:1px solid #d6d8db; font-size:0.82rem;">OFF DUTY</span>
+                <span class="badge px-3 py-2 rounded-pill" style="background:#e2e3e5;color:#383d41;border:1px solid #d6d8db;font-size:0.82rem;">OFF DUTY</span>
                 <button onclick="handlePunch()" class="btn-checkin">Check In</button>
             {% endif %}
         </div>
@@ -189,13 +251,11 @@
             <button id="capture-btn" onclick="captureAndSend()" class="btn btn-primary rounded-pill px-5 py-2 fw-bold">
                 <i class="fa fa-camera me-2"></i>CONFIRM ATTENDANCE
             </button>
-            <button onclick="cancelPunch()" class="btn btn-light rounded-pill px-4 border">
-                Cancel
-            </button>
+            <button onclick="cancelPunch()" class="btn btn-light rounded-pill px-4 border">Cancel</button>
         </div>
     </div>
 
-    <!-- Recent Activities Table -->
+    <!-- Recent Activities -->
     <div class="table-card">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h6 class="fw-bold mb-0"><i class="fa fa-clock-rotate-left me-2 text-primary"></i>Recent Activities</h6>
@@ -205,11 +265,7 @@
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>In Time</th>
-                        <th>Out Time</th>
-                        <th>Verification</th>
-                        <th>Status</th>
+                        <th>Date</th><th>In Time</th><th>Out Time</th><th>Verification</th><th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -242,22 +298,116 @@
         </div>
     </div>
 
+    <!-- ========== DAILY TASKS SECTION ========== -->
+    <div class="task-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0">
+                <i class="fa fa-list-check me-2 text-primary"></i>Daily Tasks
+                <span class="badge rounded-pill ms-2" style="background:var(--kvon-orange);font-size:0.72rem;">
+                    {{ tasks | selectattr('status','equalto','pending') | list | length }} Pending
+                </span>
+            </h6>
+            <button class="btn-add-toggle" onclick="toggleTaskForm()">
+                <i class="fa fa-plus me-1"></i> Add Task
+            </button>
+        </div>
+
+        <!-- Add Task Form -->
+        <div class="task-form-box" id="task-form-box" style="display:none;">
+            <form action="/task/add" method="POST">
+                <div class="mb-2">
+                    <input type="text" name="title" placeholder="Task title (required)" required>
+                </div>
+                <div class="mb-2">
+                    <textarea name="description" rows="2" placeholder="Description (optional)"></textarea>
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label style="font-size:0.78rem;color:#888;font-weight:600;">Due Date</label>
+                        <input type="date" name="due_date">
+                    </div>
+                    <div class="col-6">
+                        <label style="font-size:0.78rem;color:#888;font-weight:600;">Due Time</label>
+                        <input type="time" name="due_time">
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn-add-task">
+                        <i class="fa fa-check me-1"></i> Save Task
+                    </button>
+                    <button type="button" onclick="toggleTaskForm()" 
+                        style="background:#eee;border:none;border-radius:8px;padding:10px 18px;font-size:0.88rem;cursor:pointer;">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Task List -->
+        {% if tasks %}
+            {% for task in tasks %}
+            <div class="task-item {% if task.status == 'done' %}done-item{% endif %}">
+                <a href="/task/toggle/{{ task.id }}" class="task-checkbox {% if task.status == 'done' %}checked{% endif %}" title="Toggle status">
+                    {% if task.status == 'done' %}<i class="fa fa-check" style="font-size:0.7rem;"></i>{% endif %}
+                </a>
+                <div style="flex:1; min-width:0;">
+                    <div class="task-title {% if task.status == 'done' %}striked{% endif %}">
+                        {{ task.title }}
+                    </div>
+                    {% if task.description %}
+                        <div class="task-desc">{{ task.description }}</div>
+                    {% endif %}
+                    <div class="task-meta">
+                        {% if task.due_date %}
+                            <span><i class="fa fa-calendar me-1"></i>{{ task.due_date }}</span>
+                        {% endif %}
+                        {% if task.due_time %}
+                            <span><i class="fa fa-clock me-1"></i>{{ task.due_time }}</span>
+                        {% endif %}
+                        <span>
+                            {% if task.status == 'done' %}
+                                <span class="badge-done" style="font-size:0.72rem;">Done</span>
+                            {% else %}
+                                <span class="badge-pending" style="font-size:0.72rem;">Pending</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                <a href="/task/delete/{{ task.id }}" class="btn-del-task" 
+                   onclick="return confirm('Delete this task?')" title="Delete">
+                    <i class="fa fa-trash"></i>
+                </a>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="task-empty">
+                <i class="fa fa-clipboard-list fa-2x mb-2 d-block" style="color:#ddd;"></i>
+                Koi task nahi — upar "Add Task" dabao!
+            </div>
+        {% endif %}
+    </div>
+    <!-- ========== END TASKS ========== -->
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // KVON TECH — Attendance JS (Final Clean)
+    // ---- TASK FORM TOGGLE ----
+    function toggleTaskForm() {
+        const box = document.getElementById('task-form-box');
+        box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        if (box.style.display === 'block') {
+            box.querySelector('input[name="title"]').focus();
+        }
+    }
 
+    // ---- ATTENDANCE JS ----
     let streamRef = null;
     let locData = null;
 
-    // Location Promise — await se sahi coordinates aayenge
     function getLocation() {
         return new Promise((resolve) => {
-            if (!navigator.geolocation) {
-                resolve("Location not supported");
-                return;
-            }
+            if (!navigator.geolocation) { resolve("Location not supported"); return; }
             navigator.geolocation.getCurrentPosition(
                 (pos) => resolve(`${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`),
                 () => resolve("Location Denied"),
@@ -266,76 +416,57 @@
         });
     }
 
-    // Check In / Check Out button
     async function handlePunch() {
         const camArea = document.getElementById('camera-area');
         camArea.style.display = 'block';
         window.scrollTo({ top: 200, behavior: 'smooth' });
 
-        // Location background mein fetch karo
         locData = null;
         document.getElementById('location-status').innerHTML =
             '<span class="badge bg-warning text-dark"><i class="fa fa-location-dot me-1"></i> Location fetch ho rahi hai...</span>';
 
         getLocation().then((result) => {
             locData = result;
-            if (result === "Location Denied" || result === "Location not supported") {
-                document.getElementById('location-status').innerHTML =
-                    '<span class="badge bg-danger text-white"><i class="fa fa-triangle-exclamation me-1"></i> Location nahi mili — GPS on karo</span>';
-            } else {
-                document.getElementById('location-status').innerHTML =
-                    '<span class="badge bg-success text-white"><i class="fa fa-location-dot me-1"></i> Location mil gayi ✓</span>';
-            }
+            document.getElementById('location-status').innerHTML = (result === "Location Denied" || result === "Location not supported")
+                ? '<span class="badge bg-danger text-white"><i class="fa fa-triangle-exclamation me-1"></i> Location nahi mili</span>'
+                : '<span class="badge bg-success text-white"><i class="fa fa-location-dot me-1"></i> Location mil gayi ✓</span>';
         });
 
-        // Camera start karo
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
             streamRef = stream;
             document.getElementById('video').srcObject = stream;
         } catch (err) {
-            alert("Camera access mandatory hai attendance ke liye!\n\nError: " + err.message);
+            alert("Camera access mandatory hai!\n\nError: " + err.message);
             camArea.style.display = 'none';
         }
     }
 
-    // Camera band karo
     function stopCamera() {
-        if (streamRef) {
-            streamRef.getTracks().forEach(t => t.stop());
-            streamRef = null;
-        }
+        if (streamRef) { streamRef.getTracks().forEach(t => t.stop()); streamRef = null; }
         document.getElementById('video').srcObject = null;
     }
 
-    // Cancel
     function cancelPunch() {
         stopCamera();
         locData = null;
         document.getElementById('camera-area').style.display = 'none';
     }
 
-    // Selfie lo + server ko bhejo
     async function captureAndSend() {
         const v = document.getElementById('video');
         const cn = document.getElementById('canvas');
         const btn = document.getElementById('capture-btn');
 
-        if (!v.videoWidth || !v.videoHeight) {
-            alert("Camera ready nahi hai, ek second ruko!");
-            return;
-        }
+        if (!v.videoWidth || !v.videoHeight) { alert("Camera ready nahi hai!"); return; }
 
         btn.classList.add('btn-loading');
         btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Processing...';
 
-        // Selfie capture
-        cn.width = v.videoWidth;
-        cn.height = v.videoHeight;
+        cn.width = v.videoWidth; cn.height = v.videoHeight;
         cn.getContext('2d').drawImage(v, 0, 0);
         const selfieImg = cn.toDataURL('image/png');
 
-        // Location abhi bhi aa rahi ho to wait karo
         if (locData === null) {
             btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Location wait...';
             locData = await getLocation();
@@ -349,9 +480,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ selfie: selfieImg, location: locData })
             });
-
             const result = await resp.json();
-
             if (resp.ok && result.status === 'success') {
                 location.reload();
             } else {
