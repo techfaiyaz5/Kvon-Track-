@@ -1,4 +1,4 @@
-# 1. Deployment File: Ye bataegi ki app kaise chalegi
+# 1. Deployment File
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,7 +6,7 @@ metadata:
   labels:
     app: kvontrack-gemini
 spec:
-  replicas: 2 # Do pods chalenge, agar ek crash hua to dusra sambhal lega
+  replicas: 2 
   selector:
     matchLabels:
       app: kvontrack-gemini
@@ -17,11 +17,9 @@ spec:
     spec:
       containers:
       - name: kvontrack-gemini
-        # Yahan Jenkins wala image name aayega (latest tag ke saath)
         image: your-dockerhub-username/kvontrack-gemini:latest 
         ports:
         - containerPort: 5000
-        # Resources limit taaki server hang na ho
         resources:
           limits:
             cpu: "500m"
@@ -32,17 +30,17 @@ spec:
 
 ---
 
-# 2. Service File: Ab ye NodePort use karegi bina extra charge ke
+# 2. Service File: NodePort Configuration
 apiVersion: v1
 kind: Service
 metadata:
   name: kvontrack-gemini-service
 spec:
+  type: NodePort # Ye pehle aana chahiye taaki clear rahe
   selector:
     app: kvontrack-gemini
   ports:
     - protocol: TCP
-      port: 80 # Service internal port
-      targetPort: 5000 # Flask app port
-      nodePort: 31000 # Ye wo port hai jo tum browser mein use karoge
-  type: NodePort # LoadBalancer ki jagah NodePort kar diya hai
+      port: 80 
+      targetPort: 5000 
+      nodePort: 31000 # Isi port par app fix hogi
