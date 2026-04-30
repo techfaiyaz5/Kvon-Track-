@@ -4,19 +4,19 @@ kind: Deployment
 metadata:
   name: kvontrack-gemini
   labels:
-    app: kvontrack
+    app: kvontrack-gemini
 spec:
   replicas: 2 # Do pods chalenge, agar ek crash hua to dusra sambhal lega
   selector:
     matchLabels:
-      app: kvontrack
+      app: kvontrack-gemini
   template:
     metadata:
       labels:
-        app: kvontrack
+        app: kvontrack-gemini
     spec:
       containers:
-      - name: kvontrack-app
+      - name: kvontrack-gemini
         # Yahan Jenkins wala image name aayega (latest tag ke saath)
         image: your-dockerhub-username/kvontrack-gemini:latest 
         ports:
@@ -32,16 +32,17 @@ spec:
 
 ---
 
-# 2. Service File: Ye app ko bahar ki duniya (internet) se connect karegi
+# 2. Service File: Ab ye NodePort use karegi bina extra charge ke
 apiVersion: v1
 kind: Service
 metadata:
-  name: kvontrack-service
+  name: kvontrack-gemini-service
 spec:
   selector:
-    app: kvontrack
+    app: kvontrack-gemini
   ports:
     - protocol: TCP
-      port: 80 # Bahar se port 80 par access hoga
-      targetPort: 5000 # Flask app 5000 par chal rahi hai
-  type: LoadBalancer # AWS par ye ek Elastic Load Balancer (ELB) bana dega
+      port: 80 # Service internal port
+      targetPort: 5000 # Flask app port
+      nodePort: 31000 # Ye wo port hai jo tum browser mein use karoge
+  type: NodePort # LoadBalancer ki jagah NodePort kar diya hai
