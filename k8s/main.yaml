@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: kvontrack-gemini
-        image: techfaiyaz5/kvontrack-gemini:301
+        image: techfaiyaz5/kvontrack-gemini:338
         ports:
         - containerPort: 5000
         env:
