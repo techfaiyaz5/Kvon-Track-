@@ -39,9 +39,9 @@ pipeline {
             }
         }
 
-        stage('4. Deploy to Local Kubernetes') {
+        stage('4. Deploy to Local Kubernetess') {
             steps {
-                echo "🚀 EC2 Server par app live ho raha hai..."
+                echo "🚀 EC2 Server par app live ho raha hai...."
                 // K8s file me naya image tag update karo
                 sh "sed -i 's|image: .*|image: ${FULL_IMAGE}|g' k8s/main.yaml"
                 
