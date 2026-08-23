@@ -21,4 +21,4 @@ COPY . .
 EXPOSE 5000
 
 # App chalao
-CMD ["python", "app.py"]
+CMD ["python", "Back-end/app.py"]
