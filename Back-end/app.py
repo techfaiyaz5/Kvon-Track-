@@ -12,15 +12,28 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 
 # --- APP INITIALIZATION ---
-app = Flask(__name__)
+basedir = os.path.abspath(os.path.dirname(__file__))
+frontend_dir = os.path.join(basedir, '..', 'Front-end')
 
-app.config['SECRET_KEY'] = 'kvon_tech_enterprise_ultra_2026'
+app = Flask(
+    __name__,
+    template_folder=os.path.join(frontend_dir, 'templates'),
+    static_folder=os.path.join(frontend_dir, 'static')
+)
+
+# --- SECRET KEY (AWS EKS Secret se aayegi, fallback local ke liye) ---
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'kvon_tech_enterprise_ultra_2026')
 app.config['ADMIN_KEY'] = "KVON_BOSS_2026"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'kvon_final_production.db')
-app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
+# --- DATABASE (AWS RDS MySQL - environment variable se) ---
+# Local development ke liye SQLite fallback rakha hai
+# AWS par DATABASE_URL env variable automatically set hogi (k8s Secret se)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    'DATABASE_URL',
+    'sqlite:///' + os.path.join(basedir, 'kvon_final_production.db')  # Local fallback
+)
+app.config['UPLOAD_FOLDER'] = os.path.join(frontend_dir, 'static', 'uploads')
 
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])

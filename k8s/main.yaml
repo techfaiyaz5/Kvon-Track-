@@ -1,10 +1,14 @@
+# =====================================================
+# KvonTrack - AWS Production Deployment
+# =====================================================
+
 # 1. Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kvontrack-gemini
 spec:
-  replicas: 1  # SQLite ke liye abhi 1 hi rakho taaki data mismatch na ho
+  replicas: 2  # MySQL RDS hai to 2 replicas safe hain
   selector:
     matchLabels:
       app: kvontrack-gemini
@@ -15,36 +19,48 @@ spec:
     spec:
       containers:
       - name: kvontrack-gemini
-        image: techfaiyaz5/kvontrack-gemini:363
+        # ⚠️ APNA AWS_ACCOUNT_ID YAHAN DAALO (ECR URI)
+        # Format: <AWS_ACCOUNT_ID>.dkr.ecr.ap-south-1.amazonaws.com/kvontrack-gemini:latest
+        image: YOUR_AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/kvontrack-gemini:latest
         ports:
         - containerPort: 5000
         env:
+        # Timezone India
         - name: TZ
           value: "Asia/Kolkata"
-        securityContext:
-          runAsUser: 0  # Isse SQLite file banane ki permission mil jayegi
+        # RDS MySQL URL — Kubernetes Secret se aayegi
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: kvontrack-secrets
+              key: DATABASE_URL
+        # Flask Secret Key — Kubernetes Secret se aayegi
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: kvontrack-secrets
+              key: SECRET_KEY
         resources:
           requests:
             cpu: "100m"
             memory: "128Mi"
           limits:
-            cpu: "200m"
-            memory: "256Mi"
+            cpu: "300m"
+            memory: "512Mi"
 ---
-# 2. Service (NodePort)
+# 2. Service — LoadBalancer (AWS automatically public IP dega)
 apiVersion: v1
 kind: Service
 metadata:
   name: kvontrack-gemini-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: kvontrack-gemini
   ports:
     - protocol: TCP
       port: 80
       targetPort: 5000
-      nodePort: 30007
 ---
 # 3. HPA (Horizontal Pod Autoscaler)
 apiVersion: autoscaling/v2
@@ -56,7 +72,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: kvontrack-gemini
-  minReplicas: 1 # Jab tak MySQL nahi hai, ise 1 hi rehne do
+  minReplicas: 2
   maxReplicas: 5
   metrics:
   - type: Resource

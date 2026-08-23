@@ -2,69 +2,63 @@ pipeline {
     agent any
 
     environment {
-        // 1. Apna DockerHub username yahan likho (Jaise: techfaiyaz5)
-        DOCKER_HUB_USER = 'techfaiyaz5' 
-        APP_NAME = 'kvontrack-gemini'
-        IMAGE_TAG = "${env.BUILD_NUMBER}"
+        // -- Sirf ye check karein ki naam sahi hain --
+        DOCKERHUB_USERNAME = 'techfaiyaz5' 
+        APP_NAME           = 'kvontrack'
+        DOCKERHUB_CREDS    = 'dockerhub-creds' // Jo ID aapne Jenkins me di thi
+        
+        // -- Automatic Variables --
+        IMAGE_TAG          = "${env.BUILD_NUMBER}"
+        FULL_IMAGE         = "${DOCKERHUB_USERNAME}/${APP_NAME}:${IMAGE_TAG}"
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('1. Checkout Code') {
             steps {
+                echo "📥 GitHub se code pull ho raha hai..."
                 checkout scm
             }
         }
 
-        stage('Build Docker Image') {
+        stage('2. Build Docker Image') {
             steps {
-                script {
-                    echo "Building Docker Image..."
-                    sh "docker build -t ${DOCKER_HUB_USER}/${APP_NAME}:${IMAGE_TAG} ."
-                    sh "docker tag ${DOCKER_HUB_USER}/${APP_NAME}:${IMAGE_TAG} ${DOCKER_HUB_USER}/${APP_NAME}:latest"
+                echo "🐳 Docker Image ban rahi hai..."
+                sh "docker build -t ${FULL_IMAGE} ."
+                sh "docker tag ${FULL_IMAGE} ${DOCKERHUB_USERNAME}/${APP_NAME}:latest"
+            }
+        }
+
+        stage('3. Push to Docker Hub') {
+            steps {
+                echo "📤 Docker Hub par image push ho rahi hai..."
+                withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDS}", passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
+                    sh "echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin"
+                    sh "docker push ${FULL_IMAGE}"
+                    sh "docker push ${DOCKERHUB_USERNAME}/${APP_NAME}:latest"
                 }
             }
         }
 
-        stage('Push to Docker Hub') {
+        stage('4. Deploy to Local Kubernetes') {
             steps {
-                script {
-                    echo "Pushing Image to Docker Hub..."
-                    // YAHAN UPDATE KIYA HAI: 'docker-hub-creds' (Aapki screenshot ke hisaab se)
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
-                        sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
-                        sh "docker push ${DOCKER_HUB_USER}/${APP_NAME}:${IMAGE_TAG}"
-                        sh "docker push ${DOCKER_HUB_USER}/${APP_NAME}:latest"
-                    }
-                }
+                echo "🚀 EC2 Server par app live ho raha hai..."
+                // K8s file me naya image tag update karo
+                sh "sed -i 's|image: .*|image: ${FULL_IMAGE}|g' k8s/main.yaml"
+                
+                // Kubernetes cluster me deploy karo
+                sh "kubectl apply -f k8s/main.yaml"
             }
         }
+    }
 
-        stage('Update K8s Manifest') {
-            steps {
-                script {
-                    echo "Updating Deployment YAML with new Tag..."
-                                        
-                    // Note: Ensure 'github-creds' is also created in Jenkins like docker-hub-creds
-                    withCredentials([usernamePassword(credentialsId: 'github-creds', passwordVariable: 'GIT_PASS', usernameVariable: 'GIT_USER')]) {
-                        sh "git config user.email 'jenkins@example.com'"
-                        sh "git config user.name 'Jenkins CI'"
-    
-                        // 1. Forcefully GitHub se latest changes uthao aur merge karo
-                        sh "git fetch origin testing"
-                        sh "git reset --hard origin/testing"
-    
-                         // 2. Ab apni sed command chalao
-                        sh "sed -i 's|image: ${DOCKER_HUB_USER}/${APP_NAME}:.*|image: ${DOCKER_HUB_USER}/${APP_NAME}:${IMAGE_TAG}|g' k8s/main.yaml"
-    
-                        // 3. Add aur Commit (|| true lagao taaki 'nothing to commit' par build fail na ho)
-                         sh "git add k8s/main.yaml"
-                         sh "git commit -m 'Update image tag to ${env.BUILD_NUMBER}' || echo 'No changes to commit'"
-    
-                        // 4. Force Push taaki Diverge wala jhamela hi khatam ho jaye
-                        sh "git push https://${GIT_USER}:${GIT_PASS}@github.com/techfaiyaz5/Kvon-Track-.git HEAD:testing -f"
-                    }
-                }
-            }
+    post {
+        success {
+            echo "🎉 MUBARAK HO! KvonTrack App Deploy Ho Gaya Hai! 🚀"
+        }
+        always {
+            echo "🧹 Space bachane ke liye purani images clean ho rahi hain..."
+            sh "docker logout"
+            sh "docker rmi ${FULL_IMAGE} || true"
         }
     }
 }
