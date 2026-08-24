@@ -53,7 +53,7 @@ pipeline {
 
     post {
         success {
-            echo "🎉 MUBARAK HO! KvonTrack App Deploy Ho Gaya Hai! 🚀"
+            echo "🎉 MUBARAK HO. KvonTrack App Deploy Ho Gaya Hai! 🚀"
         }
         always {
             echo "🧹 Space bachane ke liye purani images clean ho rahi hain..."
