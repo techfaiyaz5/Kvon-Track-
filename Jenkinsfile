@@ -56,7 +56,7 @@ pipeline {
             echo "KvonTrack App Deployed"
         }
         always {
-            echo "🧹 Space bachane ke liye purani images clean ho rahi hain..."
+            echo "Cleaning old files for space"
             sh "docker logout"
             sh "docker rmi ${FULL_IMAGE} || true"
         }
